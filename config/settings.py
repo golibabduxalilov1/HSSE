@@ -163,7 +163,6 @@ SPECTACULAR_SETTINGS = {
     "COMPONENT_SPLIT_REQUEST": True,
 }
 
-# Logging
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
