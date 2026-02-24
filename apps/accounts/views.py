@@ -1,60 +1,73 @@
-from django.shortcuts import render
-from rest_framework import generics, permissions, status
+from rest_framework import generics
+from rest_framework.views import APIView
+from drf_spectacular.utils import extend_schema
+from core.utils import generate_otp, send_otp_email_async
+from rest_framework.permissions import AllowAny
+from django.core.cache import cache
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import get_user_model
+User = get_user_model()
+from django.core.exceptions import ValidationError
 
 # local
 from .models import User
-from .serializers import RegisterSerializer, VerifyOTPSerializer
+from .serializers import RegisterSerializer, VerifyOtpSerializer, LoginSerializers
 
 
-class RegisterCreateApiView(generics.CreateAPIView):
+class RegisterAPiView(generics.CreateAPIView):
+    permission_classes = [AllowAny]
     serializer_class = RegisterSerializer
-    permission_classes = [permissions.AllowAny]
 
-    def create(self, request, *args, **kwargs):
-        try:
-            serializer = self.serializer_class(data=request.data)
-            serializer.is_valid(raise_exception=True)
+    def perform_create(self, serializer):
+        user = serializer.save()
 
-            user = serializer.save()
+        otp = generate_otp()
 
-            return Response({
-                "message": "OTP yuborildi",
-                "status": status.HTTP_201_CREATED,
-                "role": user.role
-            }, status=status.HTTP_201_CREATED)
+        cache.set(f"otp_{user.email}", otp, timeout=60)
 
-        except Exception as e:
-            return Response({
-                "error": str(e),
-                "status": status.HTTP_400_BAD_REQUEST
-            }, status=status.HTTP_400_BAD_REQUEST)
+        cache.set(f"otp_session_{otp}", user.email, timeout=60)
+
+        send_otp_email_async(user.email, otp)
 
 
-class VerifyOtpView(generics.GenericAPIView):
-    serializer_class = VerifyOTPSerializer
-    permission_classes = [permissions.AllowAny]
+class VerifyOTPAPIView(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = VerifyOtpSerializer
 
     def post(self, request):
-        try:
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
 
-            user = serializer.save()
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-            refresh = RefreshToken.for_user(user)
+        otp = serializer.validated_data["otp"]
+        email = cache.get(f"otp_session_{otp}")
+        if not email:
+            return Response(
+                {"error": "OTP eskirgan yoki noto‘g‘ri"},
+                status=400
+            )
+        cached_otp = cache.get(f"otp_{email}")
+        if cached_otp != otp:
+            return Response(
+                {"error": "OTP noto‘g‘ri"},
+                status=400
+            )
+        user = User.objects.get(email=email)
+        user.is_active = True
+        user.save(update_fields=["is_active"])
 
-            return Response({
-                "refresh": str(refresh),
-                "access": str(refresh.access_token),
-                "message": "Profilingiz muvaffaqiyatli faollashtirildi",
-                "role": user.role,
-                "status": status.HTTP_200_OK
-            }, status=status.HTTP_200_OK)
+        cache.delete(f"otp_{email}")
+        cache.delete(f"otp_session_{otp}")
 
-        except Exception as e:
-            return Response({
-                "error": str(e),
-                "status": status.HTTP_400_BAD_REQUEST
-            }, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            "message": "Account tasdiqlandi"
+        })
+
+class LoginView(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = LoginSerializers
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.validated_data)

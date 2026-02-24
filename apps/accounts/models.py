@@ -71,7 +71,7 @@ class User(AbstractUser, TimeStampedMixin, SoftDeleteMixin):
         related_name="users",
     )
 
-    is_active = models.BooleanField(default=True, verbose_name="Faol")
+    is_active = models.BooleanField(default=False, verbose_name="Faol")
 
     objects = UserManager()
 
