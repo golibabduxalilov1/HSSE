@@ -5,7 +5,6 @@ from core.mixins import TimeStampedMixin, SoftDeleteMixin
 class Branch(TimeStampedMixin, SoftDeleteMixin):
     STATUS_CHOICES = (
         ("active", "Active"),
-        ("onboarding", "Onboarding"),
         ("inactive", "Inactive"),
     )
 
@@ -46,7 +45,6 @@ class Location(TimeStampedMixin, SoftDeleteMixin):
 class Department(TimeStampedMixin, SoftDeleteMixin):
     STATUS_CHOICES = (
         ("active", "Active"),
-        ("onboarding", "Onboarding"),
         ("inactive", "Inactive"),
     )
 

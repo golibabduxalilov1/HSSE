@@ -18,6 +18,7 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("is_active", True)
         extra_fields.setdefault("role", "superadmin")
         return self.create_user(email, password, **extra_fields)
 
@@ -37,8 +38,7 @@ class User(AbstractUser, TimeStampedMixin, SoftDeleteMixin):
     username = None
     email = models.EmailField(unique=True, verbose_name="Email")
 
-    first_name = models.CharField(max_length=100, verbose_name="Ism")
-    last_name = models.CharField(max_length=100, verbose_name="Familiya")
+    full_name = models.CharField(max_length=100, verbose_name="Ism va familiya")
     phone = models.CharField(
         max_length=20, null=True, blank=True, verbose_name="Telefon raqam"
     )
@@ -76,7 +76,7 @@ class User(AbstractUser, TimeStampedMixin, SoftDeleteMixin):
     objects = UserManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["first_name", "last_name"]
+    REQUIRED_FIELDS = ["full_name"]
 
     class Meta:
         db_table = "users"
@@ -85,11 +85,7 @@ class User(AbstractUser, TimeStampedMixin, SoftDeleteMixin):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
-
-    @property
-    def full_name(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.full_name} "
 
     def is_superadmin(self):
         return self.role == "superadmin"
