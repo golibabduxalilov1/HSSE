@@ -84,6 +84,11 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     password = serializers.CharField(required=True, write_only=True)
 
+
+class LoginSerializers(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+
     def validate(self, attrs):
         email = attrs.get("email")
         password = attrs.get("password")
@@ -123,3 +128,4 @@ class RegisterSerializer(serializers.Serializer):
 class VerifyOTPSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     otp = serializers.CharField(required=True, max_length=6)
+
