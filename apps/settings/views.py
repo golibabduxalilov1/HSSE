@@ -6,14 +6,17 @@ from drf_spectacular.utils import extend_schema
 
 from .models import Branch, Location, Department, ReportType, RiskCategory
 from .serializers import (
-    BranchSerializer, LocationSerializer, DepartmentSerializer,
-    ReportTypeSerializer, RiskCategorySerializer
+    BranchSerializer,
+    LocationSerializer,
+    DepartmentSerializer,
+    ReportTypeSerializer,
+    RiskCategorySerializer,
 )
 from .permissions import IsSuperAdminOrReadOnly
 from core.pagination import CustomPagination
 
 
-@extend_schema(tags=['Settings - Branches'])
+@extend_schema(tags=["Settings - Filiallar"])
 class BranchListCreateView(generics.ListCreateAPIView):
 
     queryset = Branch.objects.filter(is_deleted=False)
@@ -21,12 +24,12 @@ class BranchListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated, IsSuperAdminOrReadOnly]
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['status']
-    search_fields = ['name', 'address']
-    ordering_fields = ['name', 'created_at']
+    filterset_fields = ["status"]
+    search_fields = ["name", "address"]
+    ordering_fields = ["name", "created_at"]
 
 
-@extend_schema(tags=['Settings - Branches'])
+@extend_schema(tags=["Settings - Filiallar"])
 class BranchDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     queryset = Branch.objects.filter(is_deleted=False)
@@ -36,18 +39,20 @@ class BranchDetailView(generics.RetrieveUpdateDestroyAPIView):
     def perform_destroy(self, instance):
         instance.delete()
 
-@extend_schema(tags=['Settings - Departments'])
+
+@extend_schema(tags=["Settings - Bo‘limlar"])
 class DepartmentListCreateView(generics.ListCreateAPIView):
     queryset = Department.objects.filter(is_deleted=False)
     serializer_class = DepartmentSerializer
     permission_classes = [IsAuthenticated, IsSuperAdminOrReadOnly]
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['status']
-    search_fields = ['name']
-    ordering_fields = ['name', 'created_at']
+    filterset_fields = ["status"]
+    search_fields = ["name"]
+    ordering_fields = ["name", "created_at"]
 
-@extend_schema(tags=['Settings - Departments'])
+
+@extend_schema(tags=["Settings - Bo‘limlar"])
 class DepartmentDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Department.objects.filter(is_deleted=False)
     serializer_class = DepartmentSerializer
@@ -57,23 +62,26 @@ class DepartmentDetailView(generics.RetrieveUpdateDestroyAPIView):
         instance.is_deleted = True
         instance.save()
 
-@extend_schema(tags=['Settings - ReportType'])
+
+@extend_schema(tags=["Settings - Hisobot turlari"])
 class ReportTypeListCreateView(generics.ListCreateAPIView):
     queryset = ReportType.objects.all()
     serializer_class = ReportTypeSerializer
     permission_classes = [IsAuthenticated, IsSuperAdminOrReadOnly]
     pagination_class = CustomPagination
-    filterset_fields = ['status']
-    search_fields = ['name']
-    ordering_fields = ['name', 'created_at']
+    filterset_fields = ["status"]
+    search_fields = ["name"]
+    ordering_fields = ["name", "created_at"]
 
-@extend_schema(tags=['Settings - ReportType'])
+
+@extend_schema(tags=["Settings - Hisobot turlari"])
 class ReportTypeDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = ReportType.objects.all()
     serializer_class = ReportTypeSerializer
     permission_classes = [IsAuthenticated, IsSuperAdminOrReadOnly]
 
-@extend_schema(tags=['Settings - RiskCategory'])
+
+@extend_schema(tags=["Settings - Xavf toifalari"])
 class RiskCategoryListCreateView(generics.ListCreateAPIView):
     queryset = RiskCategory.objects.all()
     serializer_class = RiskCategorySerializer
@@ -81,28 +89,28 @@ class RiskCategoryListCreateView(generics.ListCreateAPIView):
     pagination_class = CustomPagination
 
 
-@extend_schema(tags=['Settings - RiskCategory'])
+@extend_schema(tags=["Settings - Xavf toifalari"])
 class RiskCategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = RiskCategory.objects.all()
     serializer_class = RiskCategorySerializer
     permission_classes = [IsAuthenticated, IsSuperAdminOrReadOnly]
 
 
-@extend_schema(tags=['Settings - Location'])
+@extend_schema(tags=["Settings - Joylashuvlar"])
 class LocationListCreateView(generics.ListCreateAPIView):
-    queryset = Location.objects.filter(is_deleted=False).select_related('branch')
+    queryset = Location.objects.filter(is_deleted=False).select_related("branch")
     serializer_class = LocationSerializer
     permission_classes = [IsAuthenticated, IsSuperAdminOrReadOnly]
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['status', 'branch']
-    search_fields = ['name', 'branch__name']
-    ordering_fields = ['name', 'created_at']
+    filterset_fields = ["status", "branch"]
+    search_fields = ["name", "branch__name"]
+    ordering_fields = ["name", "created_at"]
 
 
-@extend_schema(tags=['Settings - Location'])
+@extend_schema(tags=["Settings - Joylashuvlar"])
 class LocationDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Location.objects.filter(is_deleted=False).select_related('branch')
+    queryset = Location.objects.filter(is_deleted=False).select_related("branch")
     serializer_class = LocationSerializer
     permission_classes = [IsAuthenticated, IsSuperAdminOrReadOnly]
 

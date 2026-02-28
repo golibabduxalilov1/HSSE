@@ -1,3 +1,10 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import *
+
+@admin.register(Report)
+class ReportAdmin(admin.ModelAdmin):
+    '''Admin View for '''
+
+    list_display = ('title',)
+    

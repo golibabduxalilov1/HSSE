@@ -91,7 +91,6 @@ class Report(TimeStampedMixin, SoftDeleteMixin):
 
 
 class ReportAttachment(TimeStampedMixin):
-    """Hisobot fayli"""
 
     FILE_TYPE_CHOICES = (
         ("image", "Rasm"),
