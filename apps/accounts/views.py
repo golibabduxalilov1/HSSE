@@ -41,9 +41,8 @@ class SendRegisterOTPView(APIView):
         serializer.is_valid(raise_exception=True)
 
         email = serializer.validated_data["email"]
-        otp = generate_otp()  # 6 xonali raqam (utils.py dagi funksiya)
+        otp = generate_otp()
 
-        # Ma'lumotlarni 5 daqiqaga keshda saqlaymiz
         cache.set(f"register_otp_{email}", otp, timeout=300)
         cache.set(f"register_data_{email}", serializer.validated_data, timeout=300)
 
@@ -55,26 +54,13 @@ class SendRegisterOTPView(APIView):
         )
 
 
-# Yuqoridagi importlar qatoriga VerifyOTPSerializer ni qo'shishni unutmang!
-from .serializers import (
-    VerifyOTPSerializer,
-    UserSerializer,
-    RegisterSerializer,
-    LoginSerializer,
-)
-
-
 @extend_schema(tags=["Authentication"])
-class VerifyOTPAndRegisterView(
-    generics.GenericAPIView
-):  # <-- APIView o'rniga GenericAPIView qiling
-    """OTP ni tekshirib, foydalanuvchini yaratish"""
+class VerifyOTPAndRegisterView(generics.GenericAPIView):
 
     permission_classes = [AllowAny]
-    serializer_class = VerifyOTPSerializer  # <-- SHU QATOR QO'SHILDI
+    serializer_class = VerifyOTPSerializer
 
     def post(self, request, *args, **kwargs):
-        # Ma'lumotlarni Serializer orqali tekshiramiz
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -108,7 +94,6 @@ class VerifyOTPAndRegisterView(
         return Response(
             {
                 "message": "Muvaffaqiyatli ro'yxatdan o'tdingiz",
-                "user": UserSerializer(user).data,
                 "tokens": {
                     "refresh": str(refresh),
                     "access": str(refresh.access_token),
@@ -178,7 +163,6 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 @extend_schema(tags=["Users"])
 class CurrentUserView(generics.RetrieveUpdateAPIView):
-    """Current user view"""
 
     permission_classes = [IsAuthenticated]
 

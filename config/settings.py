@@ -193,17 +193,17 @@ SPECTACULAR_SETTINGS = {
 # }
 
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake',
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "unique-snowflake",
     }
 }
 
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST='smtp.gmail.com'
-EMAIL_PORT=587
-EMAIL_USE_TLS=True
-EMAIL_HOST_USER="ismatismoilov709@gmail.com"
-EMAIL_HOST_PASSWORD='sayd sjrv kkgi vovl'
-DEFAULT_FROM_EMAIL=EMAIL_HOST_USER
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "ismatismoilov709@gmail.com"
+EMAIL_HOST_PASSWORD = "sayd sjrv kkgi vovl"
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

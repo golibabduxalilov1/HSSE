@@ -4,7 +4,6 @@ from core.mixins import TimeStampedMixin
 
 
 class Notification(TimeStampedMixin):
-    """Bildirishnoma (Notification) model"""
 
     TYPE_CHOICES = (
         ("report_created", "Yangi hisobot"),
@@ -45,11 +44,9 @@ class Notification(TimeStampedMixin):
         verbose_name="Hisobot",
     )
 
-    # Status
     is_read = models.BooleanField(default=False, verbose_name="O'qilgan")
     read_at = models.DateTimeField(null=True, blank=True, verbose_name="O'qilgan vaqt")
 
-    # Additional data (JSON)
     extra_data = models.JSONField(
         null=True, blank=True, verbose_name="Qo'shimcha ma'lumot"
     )
