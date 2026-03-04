@@ -12,7 +12,7 @@ from .serializers import NotificationSerializer, NotificationListSerializer
 from core.pagination import CustomPagination
 
 
-@extend_schema(tags=["Notifications"])
+@extend_schema(tags=["Bildirishnomalar"])
 class NotificationListView(generics.ListAPIView):
 
     serializer_class = NotificationListSerializer
@@ -33,3 +33,81 @@ class NotificationListView(generics.ListAPIView):
             .select_related("sender", "report")
             .order_by("-created_at")
         )
+
+
+@extend_schema(tags=["Bildirishnomalar"])
+class NotificationDetailView(generics.RetrieveAPIView):
+
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Notification.objects.filter(recipient=user).select_related(
+            "sender", "report"
+        )
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        # Mark as read
+        if not instance.is_read:
+            instance.is_read = True
+            instance.read_at = timezone.now()
+            instance.save()
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+
+@extend_schema(tags=["Bildirishnomalar"])
+class NotificationMarkAsReadView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        try:
+            notification = Notification.objects.get(id=pk, recipient=request.user)
+        except Notification.DoesNotExist:
+            return Response(
+                {"error": "Bildirishnoma topilmadi"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not notification.is_read:
+            notification.is_read = True
+            notification.read_at = timezone.now()
+            notification.save()
+
+        return Response(
+            {"message": "Bildirishnoma o'qilgan deb belgilandi"},
+            status=status.HTTP_200_OK,
+        )
+
+
+@extend_schema(tags=["Bildirishnomalar"])
+class NotificationMarkAllAsReadView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        Notification.objects.filter(recipient=request.user, is_read=False).update(
+            is_read=True, read_at=timezone.now()
+        )
+
+        return Response(
+            {"message": "Barcha bildirishnomalar o'qilgan deb belgilandi"},
+            status=status.HTTP_200_OK,
+        )
+
+
+@extend_schema(tags=["Bildirishnomalar"])
+class UnreadNotificationCountView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        count = Notification.objects.filter(
+            recipient=request.user, is_read=False
+        ).count()
+
+        return Response({"count": count}, status=status.HTTP_200_OK)
