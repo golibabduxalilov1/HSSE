@@ -1,10 +1,11 @@
 from django.contrib import admin
 from .models import User
-from django.utils.html import format_html
+from unfold.admin import ModelAdmin
+
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
-  list_display = (
+class UserAdmin(ModelAdmin):
+    list_display = (
         "id",
         "email",
         "role",
