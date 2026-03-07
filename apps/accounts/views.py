@@ -2,6 +2,7 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from drf_spectacular.utils import extend_schema
 from django.core.cache import cache
@@ -26,7 +27,29 @@ class LoginView(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+
+        email = serializer.validated_data.get("email")
+        password = serializer.validated_data.get("password")
+
+        user = authenticate(username=email, password=password)
+
+        if not user:
+            raise ValidationError("Email yoki parol noto'g'ri")
+
+        if not user.is_active:
+            raise ValidationError("Foydalanuvchi faol emas")
+
+        refresh = RefreshToken.for_user(user)
+
+        return Response(
+            {
+                "tokens": {
+                    "access": str(refresh.access_token),
+                    "refresh": str(refresh),
+                },
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 @extend_schema(tags=["Authentication"])
@@ -89,15 +112,9 @@ class VerifyOTPAndRegisterView(generics.GenericAPIView):
         cache.delete(f"register_otp_{email}")
         cache.delete(f"register_data_{email}")
 
-        refresh = RefreshToken.for_user(user)
-
         return Response(
             {
                 "message": "Muvaffaqiyatli ro'yxatdan o'tdingiz",
-                "tokens": {
-                    "refresh": str(refresh),
-                    "access": str(refresh.access_token),
-                },
             },
             status=status.HTTP_201_CREATED,
         )
@@ -115,15 +132,9 @@ class RegisterView(APIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
 
-        refresh = RefreshToken.for_user(user)
-
         return Response(
             {
                 "user": UserSerializer(user).data,
-                "tokens": {
-                    "refresh": str(refresh),
-                    "access": str(refresh.access_token),
-                },
             },
             status=status.HTTP_201_CREATED,
         )

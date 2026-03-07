@@ -40,7 +40,7 @@ class BranchDetailView(generics.RetrieveUpdateDestroyAPIView):
         instance.delete()
 
 
-@extend_schema(tags=["Settings - Bo‘limlar"])
+@extend_schema(tags=["Settings - Bo'limlar"])
 class DepartmentListCreateView(generics.ListCreateAPIView):
     queryset = Department.objects.filter(is_deleted=False)
     serializer_class = DepartmentSerializer
@@ -52,7 +52,7 @@ class DepartmentListCreateView(generics.ListCreateAPIView):
     ordering_fields = ["name", "created_at"]
 
 
-@extend_schema(tags=["Settings - Bo‘limlar"])
+@extend_schema(tags=["Settings - Bo'limlar"])
 class DepartmentDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Department.objects.filter(is_deleted=False)
     serializer_class = DepartmentSerializer
@@ -81,7 +81,7 @@ class ReportTypeDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated, IsSuperAdminOrReadOnly]
 
 
-@extend_schema(tags=["Settings - Xavf toifalari"])
+@extend_schema(tags=["Settings - Xavf turlari"])
 class RiskCategoryListCreateView(generics.ListCreateAPIView):
     queryset = RiskCategory.objects.all()
     serializer_class = RiskCategorySerializer
@@ -89,14 +89,14 @@ class RiskCategoryListCreateView(generics.ListCreateAPIView):
     pagination_class = CustomPagination
 
 
-@extend_schema(tags=["Settings - Xavf toifalari"])
+@extend_schema(tags=["Settings - Xavf turlari"])
 class RiskCategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = RiskCategory.objects.all()
     serializer_class = RiskCategorySerializer
     permission_classes = [IsAuthenticated, IsSuperAdminOrReadOnly]
 
 
-@extend_schema(tags=["Settings - Joylashuvlar"])
+@extend_schema(tags=["Settings - Lokatsiyalar"])
 class LocationListCreateView(generics.ListCreateAPIView):
     queryset = Location.objects.filter(is_deleted=False).select_related("branch")
     serializer_class = LocationSerializer
@@ -108,7 +108,7 @@ class LocationListCreateView(generics.ListCreateAPIView):
     ordering_fields = ["name", "created_at"]
 
 
-@extend_schema(tags=["Settings - Joylashuvlar"])
+@extend_schema(tags=["Settings - Lokatsiyalar"])
 class LocationDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Location.objects.filter(is_deleted=False).select_related("branch")
     serializer_class = LocationSerializer

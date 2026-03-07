@@ -6,18 +6,18 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "swagger/",
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
     ),
     # Apps
-    path("api/accounts/", include("apps.accounts.urls")),
-    path("api/reports/", include("apps.reports.urls")),
-    path("api/settings/", include("apps.settings.urls")),
-    path("api/messaging/", include("apps.messaging.urls")),
-    path("api/notifications/", include("apps.notifications.urls")),
+    path("accounts/", include("apps.accounts.urls")),
+    path("reports/", include("apps.reports.urls")),
+    path("settings/", include("apps.settings.urls")),
+    path("messaging/", include("apps.messaging.urls")),
+    path("notifications/", include("apps.notifications.urls")),
 ]
 
 if settings.DEBUG:

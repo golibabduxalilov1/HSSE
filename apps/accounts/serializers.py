@@ -118,14 +118,21 @@ class RegisterSerializer(serializers.Serializer):
     branch = serializers.IntegerField(required=True)
     email = serializers.EmailField(required=True)
     password = serializers.CharField(required=True, write_only=True, min_length=8)
+    password2 = serializers.CharField(required=True, write_only=True, min_length=8)
 
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
             raise ValidationError("Bu email allaqachon ro'yxatdan o'tgan")
         return value
 
+    def validate(self, data):
+        if data["password"] != data["password2"]:
+            raise ValidationError("Passwordlar mos emas!")
+
+        data.pop("password2")
+        return data
+
 
 class VerifyOTPSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     otp = serializers.CharField(required=True, max_length=6)
-
